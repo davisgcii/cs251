@@ -1,0 +1,42 @@
+// =================== CS251 DEX Project =================== // 
+//                      Design Document                      //
+//                       George Davis                        //
+// ========================================================= //  
+
+1. Explain why adding and removing liquidity to your exchange does not change the exchange rate.
+
+When you add or remove liquidity to the liquidity pool, you do it at pools pre-existing exchange rate; this means you are adding or removing ETH and tokens in amounts that maintain the current ETH-to-token ratio. Because the exchange rate is determined by this ETH-to-token ratio, it does not change.
+
+
+2. Explain your scheme for rewarding liquidity providers and justify the design decisions you made. How does it satisfy the liquidity rewards requirements outlined in Section 7?
+
+I track how much liquidity each person has provided as a fraction of the total pool liquidity. For example, if somebody has contributed 100 ETH and the total ETH pool is 400, their fraction of the pool is 25% (represented as 250000000 / 1000000000 due to Solidity's constraints on floats).
+
+When someone swaps tokens for ETH (or vice versa), they pay a small fee (2%) out of the amount they would receive from the exchange. For example, if a user swapped 100 ETH for 400 tokens and there is a 2% fee, they would actually only receive 392 tokens -- the remaining 8 tokens (the "fee") stays in the total liquidity pool and does not go anywhere. Liquidity providers accumulate rewards because the liquidity pool grows over time as swappers add slightly more value than they receive back during swaps. Because this added fees don't change the portions of the pool that each user owns, each user receives rewards proportionally to their initial stakes.
+
+Assuming that nobody else has added or removed liquidity, when a liquidity provider goes to remove their liquidity, they receive the same portion of a larger pool, meaning that they receive an overall larger value than they originally put in.
+
+Liquidity portions are only re-calculated whenever liquidity is added or removed. This means that the constant product k does not change when users swap tokens and ETH. This maintains the constant product exchange rate even though rewards are being added (potentially unequally) to both the ETH and token reserve pools.
+
+
+3. Describe at least one method you used to minimize your exchange contract's gas usage. Why was this method effective?
+
+I considered tracking the rewards pool separately and then adding those rewards to the primary liquidity pool whenever anyone adds or removes liquidity. However, this would have increased gas costs sa it would have required tracking numerous other state variables in the contract.
+
+
+4. Optional Feedback:
+4a. How much time did you spend on the assignment?
+
+Maybe 12 hours or so.
+
+4b. What is one thing that would have been useful to know before starting the assignment?
+
+That you can't use floats in Solidity without using third-party packages, and that even then they don't work that well. I remember realizing this during project 3, but implementation was much easier and I didn't have to think about it much. I spent a lot of time on this project fighting off rounding and underflow errors.
+
+4c. If you could change one with about this assignment, what would you change?
+
+It's annoying to have to run three scripts every time I want to redeploy the project!
+
+4d. Please feel free to include any other feedback you may have below.
+
+I really enjoyed this project -- thanks for making it!

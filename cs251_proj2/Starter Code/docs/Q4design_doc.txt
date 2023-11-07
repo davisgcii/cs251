@@ -1,0 +1,32 @@
+######################################################################
+#
+# TODO: Write a short (1-3 paragraph) design document about your solution to Q4.
+#       Please include the following:
+#     
+#         1) An explanation of what you wrote and how the ScriptPubKey works
+#         2) Briefly, how the ScriptPubKey you wrote fits into the bigger 
+#            picture of this atomic swap.
+#         3) Consider the case of Alice sending coins to Bob with coinExchangeScript:
+#            Why can Alice always get her money back if Bob doesn't redeem it? 
+#            Why can't this be solved with a simple 1-of-2 multisig? 
+#
+
+1. The ScriptPK runs a if/else statement -- if the last value in the ScriptSig is true
+   (equal to 1), then it assumes that the recipient knows the secret key and runs a script
+   to ensure that the hash of the secret key matches the provided hash and that the recipient
+   signed the transaction. If the last value of the ScriptSig is false, then it assumes that the
+   sender is trying to retrieve their money and checks for signatures from both the sender and 
+   recipient. As long as the sender and recipient know the correct formats for their ScriptSigs,
+   then they can retrieve or redeem their money appropriately.
+
+2. In addition to the ScriptPK I created, other transactions are created with locktimes that allow
+   the original senders to retrieve their money in the event that the recipient doesn't take it.
+   For example, if both Alice and Bob create transactions using my ScriptPK and then Alice never
+   sends Bob the secret x, then Bob has a backup transaction that allows him to retrieve from the
+   same transaction hash assuming that the locktime has passed.
+
+3. Alice can always get her money back if Bob doesn't redeem it because she will have retrieved Bob's
+   signature in advance -- in the event that Bob doesn't retrieve the money, she has Bob's signature and
+   can redeem her money by spending from the additional transaction she made that has a locktime. A
+   simple 1-of-2 multisig would not work because that would allow either Bob or Alice to retrieve the
+   funds at any time.
